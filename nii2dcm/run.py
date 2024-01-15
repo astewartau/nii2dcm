@@ -5,7 +5,8 @@ from os.path import abspath
 
 import nibabel as nib
 import pydicom as pyd
-
+import numpy as np
+from scipy.stats import norm
 import nii2dcm.nii
 import nii2dcm.svr
 from nii2dcm.dcm_writer import (
@@ -32,7 +33,26 @@ def run_nii2dcm(input_nii_path, output_dcm_path, dicom_type=None, ref_dicom_file
     # get pixel data from NIfTI
     # TODO: create method in nii class
     nii_img = nii.get_fdata()
-    nii_img = nii_img.astype("uint16")  # match DICOM datatype
+
+    # Continue using the offset image
+    offset_img = nii_img + 2048
+
+    # Calculate the range of the original data (before offsetting)
+    original_range = nii_img.max() - nii_img.min()
+
+    # Apply a scaling factor based on the original range
+    # This will keep the distribution of the data similar to the original
+    scaling_factor = 65535 / original_range
+
+    # Scale the offset data
+    scaled_img = (offset_img - 2048) * scaling_factor + 2048
+
+    # Clip values outside the uint16 range
+    scaled_img[scaled_img < 0] = 0
+    scaled_img[scaled_img > 65535] = 65535
+
+    # Convert to uint16
+    nii_img = scaled_img.astype(np.uint16)
 
     # get NIfTI parameters
     nii2dcm_parameters = nii2dcm.nii.Nifti.get_nii2dcm_parameters(nii)
@@ -48,7 +68,7 @@ def run_nii2dcm(input_nii_path, output_dcm_path, dicom_type=None, ref_dicom_file
     if dicom_type is not None and dicom_type.upper() in ['SVR']:
         dicom = nii2dcm.svr.DicomMRISVR('nii2dcm_dicom_mri_svr.dcm')
         nii_img = nii.get_fdata()
-        nii_img[nii_img < 0] = 0  # set background pixels = 0 (negative in SVRTK)
+        nii_img[nii_img == 0] = 0  # set background pixels = 0 (negative in SVRTK)
         nii_img = nii_img.astype("uint16")
 
     # load reference DICOM object

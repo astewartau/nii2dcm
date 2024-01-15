@@ -30,7 +30,9 @@ class Nifti:
         if nib_nii.header['dim'][4] == 1:
             nX, nY, nZ, nF = nib_nii.header['dim'][1], nib_nii.header['dim'][2], nib_nii.header['dim'][3], 1
             dimX, dimY, dimZ = nib_nii.header['pixdim'][1], nib_nii.header['pixdim'][2], nib_nii.header['pixdim'][3]
-
+        elif nib_nii.header['dim'][0] == 3 and all([x > 1 for x in nib_nii.header['dim'][1:4]]):
+            nX, nY, nZ, nF = (nib_nii.header['dim'][1:4].tolist() + [1])
+            dimX, dimY, dimZ = nib_nii.header['pixdim'][1:4].tolist()
         elif nib_nii.header['dim'][4] > 1:
             print("Warning: Nifti is not 3-dimensional.")
 
