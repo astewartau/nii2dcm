@@ -29,6 +29,7 @@ def cli(args=None):
         help="[string] type of DICOM. Available types: MR, SVR."
     )
     parser.add_argument("-r", "--ref_dicom", type=str, help="[.dcm] Reference DICOM file for Attribute transfer")
+    parser.add_argument("-c", "--centered", action="store_true", help="Indicates that values are centered around zero and should be robustly scaled to be centered around 2048")
     parser.add_argument("-v", "--version", action="version", version=__version__)
 
     args = parser.parse_args()
@@ -60,7 +61,8 @@ def cli(args=None):
         input_file,
         output_dir,
         dicom_type,
-        ref_dicom_file
+        ref_dicom_file,
+        args.centered
     )
 
 
