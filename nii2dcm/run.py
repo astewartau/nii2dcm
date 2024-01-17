@@ -35,25 +35,21 @@ def run_nii2dcm(input_nii_path, output_dcm_path, dicom_type=None, ref_dicom_file
     nii_img = nii.get_fdata()
 
     if centered:
+        # Normalize the data
+        mean_val = nii_img.mean()
+        std_val = nii_img.std()
+        normalized_img = (nii_img - mean_val) / std_val
 
-        # Continue using the offset image
-        offset_img = nii_img + 2048
+        # Rescale the normalized data to fit within the desired range
+        # Adjust the factor to fit your specific data
+        rescaled_img = normalized_img * 50 + 2048
 
-        # Calculate the range of the original data (before offsetting)
-        original_range = nii_img.max() - nii_img.min()
+        # Clip values to prevent overflow
+        rescaled_img = np.clip(rescaled_img, 0, 65535)
 
-        # Apply a scaling factor based on the original range
-        # This will keep the distribution of the data similar to the original
-        scaling_factor = 65535 / original_range
+        # Assign the rescaled image to nii_img
+        nii_img = rescaled_img
 
-        # Scale the offset data
-        nii_img = (offset_img - 2048) * scaling_factor + 2048
-
-        # Clip values outside the uint16 range
-        nii_img[nii_img < 0] = 0
-        nii_img[nii_img > 65535] = 65535
-
-    # Convert to uint16
     nii_img = nii_img.astype(np.uint16)
 
     # get NIfTI parameters
