@@ -304,10 +304,9 @@ class DicomMRI(Dicom):
 
 class DicomMRIFloat(DicomMRI):
     """
-    DicomMRIFloat subclass - High-precision floating point preservation
-    - Uses standard PixelData with 32-bit signed integers for maximum compatibility
-    - Very high precision RescaleSlope/RescaleIntercept to preserve float values
-    - Compatible with all DICOM viewers including ITK-SNAP
+    DicomMRIFloat subclass - floating point preservation
+    - Uses standard PixelData with 32-bit signed integers
+    - RescaleSlope/RescaleIntercept to preserve float values
     """
 
     def __init__(self, filename=nii2dcm_temp_filename):
