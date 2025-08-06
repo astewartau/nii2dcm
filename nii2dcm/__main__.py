@@ -30,7 +30,7 @@ def cli(args=None):
     )
     parser.add_argument("-r", "--ref_dicom", type=str, help="[.dcm] Reference DICOM file for Attribute transfer")
     parser.add_argument("-c", "--centered", action="store_true", 
-                        help="Apply statistical normalization: center data around 2048 using robust z-score scaling.")
+                        help="Center data around 2048 using z-score scaling.")
     parser.add_argument("-f", "--float", type=float, nargs='?', const=True, 
                         help="Preserve quantitative floating-point values using 32-bit signed integers with DICOM RescaleSlope/Intercept. "
                              "Use alone (--float) for automatic precision optimization, or specify scale factor (--float 1e-6) for reproducible scaling. "
