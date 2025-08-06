@@ -6,7 +6,6 @@ from os.path import abspath
 import nibabel as nib
 import pydicom as pyd
 import numpy as np
-from scipy.stats import norm
 import nii2dcm.nii
 import nii2dcm.svr
 from nii2dcm.dcm_writer import (
@@ -54,16 +53,16 @@ def run_nii2dcm(input_nii_path, output_dcm_path, dicom_type=None, ref_dicom_file
         nii_img = rescaled_img
 
     if use_float:
-        # High-precision integer scaling for maximum viewer compatibility
-        # Use 32-bit signed integers with very precise rescale parameters
+        # Use integer scaling for floating-point representation
+        # Use 32-bit signed integers with a rescale parameter
         data_min = nii_img.min()
         data_max = nii_img.max()
         
         if data_min < data_max:
             if isinstance(use_float, bool):
                 # Automatic mode: optimize scale factor for this dataset
-                int32_min = -2**30  # -1,073,741,824
-                int32_max = 2**30 - 1   #  1,073,741,823
+                int32_min = -2**30
+                int32_max = 2**30 - 1
                 scale_factor = (data_max - data_min) / (int32_max - int32_min)
                 print(f"nii2dcm: Auto-selected scale factor {scale_factor:.2e} for data range [{data_min:.6f}, {data_max:.6f}]")
             else:
