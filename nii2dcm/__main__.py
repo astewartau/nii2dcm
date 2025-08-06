@@ -29,7 +29,13 @@ def cli(args=None):
         help="[string] type of DICOM. Available types: MR, SVR."
     )
     parser.add_argument("-r", "--ref_dicom", type=str, help="[.dcm] Reference DICOM file for Attribute transfer")
-    parser.add_argument("-c", "--centered", action="store_true", help="Indicates that values are centered around zero and should be robustly scaled to be centered around 2048")
+    parser.add_argument("-c", "--centered", action="store_true", 
+                        help="Apply statistical normalization: center data around 2048 using robust z-score scaling.")
+    parser.add_argument("-f", "--float", type=float, nargs='?', const=True, 
+                        help="Preserve quantitative floating-point values using 32-bit signed integers with DICOM RescaleSlope/Intercept. "
+                             "Use alone (--float) for automatic precision optimization, or specify scale factor (--float 1e-6) for reproducible scaling. "
+                             "Scale factor represents the smallest meaningful difference in your data. "
+                             "Note: May not be compatible with all DICOM viewers. Essential for quantitative analysis.")
     parser.add_argument("-v", "--version", action="version", version=__version__)
 
     args = parser.parse_args()
@@ -62,7 +68,8 @@ def cli(args=None):
         output_dir,
         dicom_type,
         ref_dicom_file,
-        args.centered
+        args.centered,
+        args.float
     )
 
 
